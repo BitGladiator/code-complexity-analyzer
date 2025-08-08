@@ -6,6 +6,8 @@ void hello() {
         if (i % 2 == 0)
             cout << i << endl;
     }
+
+
 }
 
 int main() {

@@ -1,6 +1,10 @@
 #include "analyzer.hpp"
 #include <iostream>
-#include "json.hpp"
+
+#include <vector>
+#include <utility>
+
+#include "json.hpp"  
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -9,10 +13,22 @@ int main(int argc, char* argv[]) {
     }
 
     Analyzer analyzer(argv[1]);
-    auto result = analyzer.analyze();
+    auto summary = analyzer.analyze();
+    auto funcDetails = analyzer.analyzeFunctions();
 
-    nlohmann::json jsonResult(result);
+    nlohmann::json jsonResult;
+    jsonResult["summary"] = summary;
+
+    for (auto &f : funcDetails) {
+        jsonResult["functions_detail"].push_back({
+            {"name", std::get<0>(f)},
+            {"complexity", std::get<1>(f)},
+            {"issues", std::get<2>(f)},
+            {"time_complexity", std::get<3>(f)},
+            {"space_complexity", std::get<4>(f)}
+        });
+    }
+
     std::cout << jsonResult.dump(4) << std::endl;
-
     return 0;
 }

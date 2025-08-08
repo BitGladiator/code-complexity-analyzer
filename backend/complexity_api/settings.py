@@ -31,6 +31,8 @@ SECRET_KEY = 'django-insecure-+97q_xn70)_xj6maa9s4e^9f5o(wreb6)2j1jrcako%xmzm%0r
 # Application definition
 
 INSTALLED_APPS = [
+    'complexity_api',
+    'corsheaders',
     'rest_framework',
     'analyzer_app',
     'django.contrib.admin',
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,3 +127,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+
+
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+
+CORS_ALLOW_ALL_ORIGINS = True
