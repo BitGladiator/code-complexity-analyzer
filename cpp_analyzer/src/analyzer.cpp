@@ -4,6 +4,7 @@
 #include <regex>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 Analyzer::Analyzer(const std::string& filename) {
     loadFile(filename);
@@ -47,6 +48,7 @@ std::map<std::string, int> Analyzer::analyze() {
         {"conditionals", countConditionals()}
     };
 }
+
 size_t findMatchingBrace(const std::string& code, size_t startPos) {
     int braceCount = 0;
     for (size_t i = startPos; i < code.size(); i++) {
@@ -58,12 +60,14 @@ size_t findMatchingBrace(const std::string& code, size_t startPos) {
     }
     return std::string::npos;
 }
+
 // Helper function declarations
 int getMaxNestingLevel(const std::string& code);
 int getFunctionLength(const std::string& funcCode);
 bool isRecursive(const std::string& funcName, const std::string& funcCode);
 int countArrays(const std::string& funcCode);
-std::string estimateTimeComplexity(int loopDepth, bool recursive);
+int getMaxLoopDepth(const std::string& funcCode); // New function for proper loop depth
+std::string estimateTimeComplexity(int loopDepth, bool recursive, int totalLoops);
 std::string estimateSpaceComplexity(int arrayCount);
 
 std::vector<std::tuple<std::string, int, std::vector<std::string>, std::string, std::string>> Analyzer::analyzeFunctions() {
@@ -89,6 +93,13 @@ std::vector<std::tuple<std::string, int, std::vector<std::string>, std::string, 
             std::sregex_iterator()
         );
 
+        // Count total loops in function
+        std::regex loopRegex(R"(\b(for|while|do)\b)");
+        int totalLoops = std::distance(
+            std::sregex_iterator(funcCode.begin(), funcCode.end(), loopRegex),
+            std::sregex_iterator()
+        );
+
         // Suggestions based on nesting and length
         std::vector<std::string> suggestions;
         int maxNesting = getMaxNestingLevel(funcCode);
@@ -97,25 +108,24 @@ std::vector<std::tuple<std::string, int, std::vector<std::string>, std::string, 
         int length = getFunctionLength(funcCode);
         if (length > 50) suggestions.push_back("Long function (>50 lines), consider splitting");
 
-        // New: Check recursion
+        // Check recursion
         bool recursive = isRecursive(funcName, funcCode);
         if (recursive) suggestions.push_back("Function is recursive");
 
-        // New: Count arrays for space estimation
+        // Count arrays for space estimation
         int arrays = countArrays(funcCode);
 
-        // New: Estimate time and space complexities
-        std::string timeComplexity = estimateTimeComplexity(maxNesting, recursive);
+        // Get maximum loop depth for time complexity
+        int maxLoopDepth = getMaxLoopDepth(funcCode);
+
+        // Estimate time and space complexities
+        std::string timeComplexity = estimateTimeComplexity(maxLoopDepth, recursive, totalLoops);
         std::string spaceComplexity = estimateSpaceComplexity(arrays);
 
         results.push_back(std::make_tuple(funcName, complexity, suggestions, timeComplexity, spaceComplexity));
     }
     return results;
 }
-
-// Find matching closing brace for a function starting at startPos (assumes code[startPos] == '{' or after function signature)
-
-
 
 int getMaxNestingLevel(const std::string& code) {
     int maxLevel = 0, currentLevel = 0;
@@ -150,15 +160,94 @@ int countArrays(const std::string& funcCode) {
     );
 }
 
-std::string estimateTimeComplexity(int loopDepth, bool recursive) {
-    if (recursive) return "O(2^n)";  // naive assumption for recursion
-    if (loopDepth == 0) return "O(1)";
+// New function to properly calculate maximum loop depth
+int getMaxLoopDepth(const std::string& funcCode) {
+    int maxDepth = 0;
+    int currentDepth = 0;
+    std::regex loopRegex(R"(\b(for|while|do)\s*\()");
+    
+    // Simple approach: track braces and loop keywords
+    size_t pos = 0;
+    std::vector<int> loopLevels;
+    int braceLevel = 0;
+    
+    for (size_t i = 0; i < funcCode.size(); i++) {
+        if (funcCode[i] == '{') {
+            braceLevel++;
+        } else if (funcCode[i] == '}') {
+            // Remove any loop levels at this brace level or deeper
+            while (!loopLevels.empty() && loopLevels.back() >= braceLevel) {
+                loopLevels.pop_back();
+            }
+            braceLevel--;
+        }
+    }
+    
+    // Reset and do proper loop depth calculation
+    std::string::const_iterator searchStart(funcCode.cbegin());
+    std::smatch match;
+    std::vector<size_t> loopPositions;
+    
+    // Find all loop positions
+    while (std::regex_search(searchStart, funcCode.cend(), match, loopRegex)) {
+        loopPositions.push_back(match.position() + (searchStart - funcCode.cbegin()));
+        searchStart = match.suffix().first;
+    }
+    
+    // For each loop, count how many other loops contain it
+    for (size_t loopPos : loopPositions) {
+        int depth = 0;
+        
+        // Count braces before this loop to determine nesting
+        int braces = 0;
+        for (size_t i = 0; i < loopPos && i < funcCode.size(); i++) {
+            if (funcCode[i] == '{') braces++;
+            else if (funcCode[i] == '}') braces--;
+        }
+        
+        // Count how many loops are at higher brace levels (containing this loop)
+        for (size_t otherPos : loopPositions) {
+            if (otherPos < loopPos) {
+                int otherBraces = 0;
+                for (size_t i = 0; i < otherPos && i < funcCode.size(); i++) {
+                    if (funcCode[i] == '{') otherBraces++;
+                    else if (funcCode[i] == '}') otherBraces--;
+                }
+                if (otherBraces < braces) {
+                    depth++;
+                }
+            }
+        }
+        
+        depth++; // Count the loop itself
+        maxDepth = std::max(maxDepth, depth);
+    }
+    
+    return maxDepth;
+}
+
+std::string estimateTimeComplexity(int loopDepth, bool recursive, int totalLoops) {
+    if (recursive) {
+        // More nuanced recursive analysis
+        if (totalLoops > 0) {
+            return "O(n * 2^n)"; // Recursive with loops
+        }
+        return "O(2^n)"; // Simple recursion
+    }
+    
+    if (loopDepth == 0 && totalLoops == 0) return "O(1)";
     if (loopDepth == 1) return "O(n)";
     if (loopDepth == 2) return "O(n^2)";
-    return "O(n^" + std::to_string(loopDepth) + ")";
+    if (loopDepth == 3) return "O(n^3)";
+    if (loopDepth > 3) return "O(n^" + std::to_string(loopDepth) + ")";
+    
+    // Fallback for edge cases
+    if (totalLoops > 0) return "O(n)";
+    return "O(1)";
 }
 
 std::string estimateSpaceComplexity(int arrayCount) {
     if (arrayCount == 0) return "O(1)";
-    return "O(n)";
+    if (arrayCount == 1) return "O(n)";
+    return "O(n^" + std::to_string(arrayCount) + ")";
 }

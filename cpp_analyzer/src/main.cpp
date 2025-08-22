@@ -1,9 +1,7 @@
 #include "analyzer.hpp"
 #include <iostream>
-
 #include <vector>
 #include <utility>
-
 #include "json.hpp"  
 
 int main(int argc, char* argv[]) {
@@ -16,9 +14,34 @@ int main(int argc, char* argv[]) {
     auto summary = analyzer.analyze();
     auto funcDetails = analyzer.analyzeFunctions();
 
-    nlohmann::json jsonResult;
-    jsonResult["summary"] = summary;
+    // Categorize functions by complexity
+    int simpleCount = 0;
+    int moderateCount = 0;
+    int complexCount = 0;
 
+    for (auto &f : funcDetails) {
+        int complexity = std::get<1>(f);
+        if (complexity <= 3) {
+            simpleCount++;
+        } else if (complexity <= 6) {
+            moderateCount++;
+        } else {
+            complexCount++;
+        }
+    }
+
+    nlohmann::json jsonResult;
+    
+    // Original summary metrics
+    jsonResult["summary"] = summary;
+    
+    // Add complexity categorization
+    jsonResult["summary"]["simple"] = simpleCount;
+    jsonResult["summary"]["moderate"] = moderateCount;
+    jsonResult["summary"]["complex"] = complexCount;
+    jsonResult["summary"]["total_functions"] = funcDetails.size();
+
+    // Function details
     for (auto &f : funcDetails) {
         jsonResult["functions_detail"].push_back({
             {"name", std::get<0>(f)},

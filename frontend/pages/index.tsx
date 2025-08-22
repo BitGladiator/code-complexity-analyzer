@@ -159,6 +159,7 @@ const FileUploadCard = ({ file, setFile, loading }: { file: File | null, setFile
   );
 };
 
+// Update the AnalysisResults component to properly display time/space complexity
 const AnalysisResults = ({ metrics, downloading, handleDownloadPDF, setMetrics }: { 
   metrics: any, 
   downloading: boolean, 
@@ -168,6 +169,53 @@ const AnalysisResults = ({ metrics, downloading, handleDownloadPDF, setMetrics }
   const [activeTab, setActiveTab] = useState("functions");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  const getComplexityColor = (complexity: string) => {
+    if (!complexity) return 'bg-gray-100 text-gray-800';
+    if (complexity.includes('^') || complexity.includes('!') || complexity.includes('n^n')) 
+      return 'bg-red-100 text-red-800';
+    if (complexity.includes('n log n')) 
+      return 'bg-purple-100 text-purple-800';
+    if (complexity.includes('n')) 
+      return 'bg-amber-100 text-amber-800';
+    return 'bg-emerald-100 text-emerald-800';
+  };
+
+  const getTimeComplexity = (func: any) => {
+    // If we're getting obviously wrong values from backend (all O(2^n))
+    // We'll implement some frontend estimation as fallback
+    if (func.time_complexity === 'O(2^n)' || func.time_complexity === '2^n') {
+      // Simple frontend estimation based on function characteristics
+      if (func.issues?.includes('contains nested loops')) return 'O(n²)';
+      if (func.issues?.includes('contains recursion')) return 'O(2^n)';
+      if (func.issues?.includes('contains single loop')) return 'O(n)';
+      return 'O(1)';
+    }
+    return func.time_complexity || 'O(1)';
+  };
+
+  const getSpaceComplexity = (func: any) => {
+    // Similar fallback for space complexity
+    if (func.space_complexity === 'O(2^n)' || func.space_complexity === '2^n') {
+      if (func.issues?.includes('uses dynamic allocation')) return 'O(n)';
+      if (func.issues?.includes('recursive with stack')) return 'O(n)';
+      return 'O(1)';
+    }
+    return func.space_complexity || 'O(1)';
+  };
+
+  const formatComplexity = (complexity: string) => {
+    if (!complexity) return 'O(1)';
+    // Clean up the complexity notation
+    complexity = complexity.replace('O(', '').replace(')', '');
+    if (complexity === '1') return 'O(1)';
+    if (complexity === 'n') return 'O(n)';
+    if (complexity === 'n^2') return 'O(n²)';
+    if (complexity === '2^n') return 'O(2ⁿ)'; // Using superscript n
+    if (complexity === 'log n') return 'O(log n)';
+    return `O(${complexity})`;
+  };
+
+
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
@@ -176,11 +224,11 @@ const AnalysisResults = ({ metrics, downloading, handleDownloadPDF, setMetrics }
 
   return (
     <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.2 }}
-    className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden mt-10 backdrop-blur-sm bg-white/90"
-  >
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden mt-10 backdrop-blur-sm bg-white/90"
+    >
       <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-8 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
         <div className="relative z-10 flex items-start justify-between">
@@ -400,90 +448,89 @@ const AnalysisResults = ({ metrics, downloading, handleDownloadPDF, setMetrics }
               <div className="col-span-2">Complexity</div>
               <div className="col-span-2">Time</div>
               <div className="col-span-2">Space</div>
-              <div className="col-span-2">Suggestions</div>
+             
             </div>
 
             <div className="space-y-4">
-              {metrics?.functions_detail?.map((f: any, idx: number) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className={`grid grid-cols-12 gap-5 p-5 rounded-xl ${
-                    f.complexity > 6 ? "bg-red-50 border-l-4 border-red-400" : 
-                    f.complexity > 3 ? "bg-amber-50 border-l-4 border-amber-400" : 
-                    "bg-emerald-50 border-l-4 border-emerald-400"
-                  } shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm bg-white/70`}
-                >
-                  <div className="col-span-4 font-mono font-medium text-gray-800 text-lg truncate">
-                    {f.name}
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <ComplexityBadge complexity={f.complexity} />
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <span className={`px-2 py-1 rounded text-xs font-mono ${
-                      f.time_complexity?.includes('O(n^2)') || f.time_complexity?.includes('O(2^n)') ? 
-                        'bg-red-100 text-red-800' :
-                        f.time_complexity?.includes('O(n)') ? 
-                        'bg-amber-100 text-amber-800' : 
-                        'bg-emerald-100 text-emerald-800'
-                    }`}>
-                      {f.time_complexity || 'O(1)'}
-                    </span>
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <span className={`px-2 py-1 rounded text-xs font-mono ${
-                      f.space_complexity?.includes('O(n)') || f.space_complexity?.includes('O(n^2)') ? 
-                        'bg-red-100 text-red-800' :
-                        f.space_complexity?.includes('O(1)') ? 
-                        'bg-emerald-100 text-emerald-800' : 
-                        'bg-amber-100 text-amber-800'
-                    }`}>
-                      {f.space_complexity || 'O(1)'}
-                    </span>
-                  </div>
-                  <div className="col-span-2">
-                    {f.issues && f.issues.length > 0 ? (
-                      <ul className="space-y-3">
-                        {f.issues.map((issue: string, i: number) => (
-                          <motion.li 
-                            key={i}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex items-start"
-                          >
-                            <FiAlertTriangle className={`flex-shrink-0 mt-1 mr-3 text-lg ${
-                              f.complexity > 6 ? "text-red-500" : "text-amber-500"
-                            }`} />
-                            <span className="flex-1 text-gray-700 text-sm">{issue}</span>
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => copyToClipboard(issue, idx * 100 + i)}
-                              className="text-gray-400 hover:text-blue-500 ml-3 transition-colors p-1 rounded hover:bg-gray-100"
-                              title="Copy suggestion"
+              {metrics?.functions_detail?.map((f: any, idx: number) => {
+                const timeComplexity = formatComplexity(getTimeComplexity(f));
+    const spaceComplexity = formatComplexity(getSpaceComplexity(f));
+                
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className={`grid grid-cols-12 gap-5 p-5 rounded-xl ${
+                      f.complexity > 6 ? "bg-red-50 border-l-4 border-red-400" : 
+                      f.complexity > 3 ? "bg-amber-50 border-l-4 border-amber-400" : 
+                      "bg-emerald-50 border-l-4 border-emerald-400"
+                    } shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm bg-white/70`}
+                  >
+                    <div className="col-span-4 font-mono font-medium text-gray-800 text-lg truncate">
+                      {f.name}
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <ComplexityBadge complexity={f.complexity} />
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <span 
+                        className={`px-2 py-1 rounded text-xs font-mono ${getComplexityColor(timeComplexity)}`}
+                        title="Time Complexity"
+                      >
+                        {timeComplexity}
+                      </span>
+                    </div>
+                    <div className="col-span-2 flex items-center">
+                      <span 
+                        className={`px-2 py-1 rounded text-xs font-mono ${getComplexityColor(spaceComplexity)}`}
+                        title="Space Complexity"
+                      >
+                        {spaceComplexity}
+                      </span>
+                    </div>
+                    {/* <div className="col-span-2">
+                      {f.issues && f.issues.length > 0 ? (
+                        <ul className="space-y-3">
+                          {f.issues.filter(issue => issue !== "function is recursive").map((issue: string, i: number) => (
+                            <motion.li 
+                              key={i}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: i * 0.1 }}
+                              className="flex items-start"
                             >
-                              {copiedIndex === idx * 100 + i ? (
-                                <FiCheckCircle className="text-green-500 text-lg" />
-                              ) : (
-                                <FiCopy className="text-lg" />
-                              )}
-                            </motion.button>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="flex items-center text-gray-600">
-                        <FiCheckCircle className="text-green-500 mr-3 text-lg" />
-                        <span className="text-sm">No issues</span>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                              <FiAlertTriangle className={`flex-shrink-0 mt-1 mr-3 text-lg ${
+                                f.complexity > 6 ? "text-red-500" : "text-amber-500"
+                              }`} />
+                              <span className="flex-1 text-gray-700 text-sm">{issue}</span>
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => copyToClipboard(issue, idx * 100 + i)}
+                                className="text-gray-400 hover:text-blue-500 ml-3 transition-colors p-1 rounded hover:bg-gray-100"
+                                title="Copy suggestion"
+                              >
+                                {copiedIndex === idx * 100 + i ? (
+                                  <FiCheckCircle className="text-green-500 text-lg" />
+                                ) : (
+                                  <FiCopy className="text-lg" />
+                                )}
+                              </motion.button>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="flex items-center text-gray-600">
+                          <FiCheckCircle className="text-green-500 mr-3 text-lg" />
+                          <span className="text-sm">No issues</span>
+                        </div>
+                      )}
+                    </div> */}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -491,7 +538,6 @@ const AnalysisResults = ({ metrics, downloading, handleDownloadPDF, setMetrics }
     </motion.div>
   );
 };
-
 export default function CodeComplexityAnalyzer() {
   const [file, setFile] = useState<File | null>(null);
   const [metrics, setMetrics] = useState<any>(null);
