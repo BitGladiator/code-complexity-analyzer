@@ -301,7 +301,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 **⭐ If this project helped you, please give it a star! ⭐**
 
-Made with ❤️ by [Your Name](https://github.com/bitgladiator)
+Made with ❤️ by [Karan Sharma](https://github.com/bitgladiator)
 
 *Empowering developers to write better, more maintainable C++ code*
 
