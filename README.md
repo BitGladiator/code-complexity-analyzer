@@ -1,4 +1,4 @@
-## C++ Code Complexity Analyzer
+# C++ Code Complexity Analyzer
 
 <div align="center">
 
@@ -37,20 +37,20 @@
 - **Nesting Depth Detection** - Identifies deeply nested code structures that impact maintainability
 - **Loop & Conditional Counting** - Comprehensive control flow analysis
 
-###**Performance Intelligence**
+### **Performance Intelligence**
 - **Time Complexity Estimation** - Algorithmic complexity analysis (O(1), O(n), O(n²), O(2ⁿ))
 - **Space Complexity Analysis** - Memory usage pattern detection
 - **Recursion Detection** - Identifies recursive functions and potential stack overflow risks
 - **Array Usage Tracking** - Memory allocation pattern analysis
 
-###**Premium User Experience**
+### **Premium User Experience**
 - **Drag & Drop Upload** - Intuitive file handling with visual feedback
 - **Real-time Processing** - Instant analysis with progress indicators
 - **Interactive Visualizations** - Beautiful charts powered by Chart.js
 - **Responsive Design** - Seamless experience across all devices
 - **Dark Mode Support** - Eye-friendly interface options
 
-###**Professional Reporting**
+### **Professional Reporting**
 - **PDF Export** - Generate comprehensive analysis reports
 - **Detailed Metrics** - Function-by-function breakdown
 - **Actionable Insights** - Specific recommendations for code improvement
@@ -58,7 +58,7 @@
 
 ---
 
-##Tech Stack
+## Tech Stack
 
 ### **Frontend**
 - **Framework**: Next.js 15 with TypeScript
