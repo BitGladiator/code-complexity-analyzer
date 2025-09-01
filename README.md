@@ -1,4 +1,4 @@
-#C++ Code Complexity Analyzer
+## C++ Code Complexity Analyzer
 
 <div align="center">
 
@@ -19,7 +19,7 @@
 
 <div align="center">
 
-###Modern Interface
+### Modern Interface
 ![Home Page](images/screenshot1.png)
 
 ### Comprehensive Analytics
