@@ -1,4 +1,4 @@
-# 🔍 C++ Code Complexity Analyzer
+#C++ Code Complexity Analyzer
 
 <div align="center">
 
@@ -15,42 +15,42 @@
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
 
-### 🏠 Modern Interface
+###Modern Interface
 ![Home Page](images/screenshot1.png)
 
-### 📊 Comprehensive Analytics
+### Comprehensive Analytics
 ![Code Metrics](images/screenshot2.png)
 
 </div>
 
 ---
 
-## 🚀 Features
+## Features
 
-### 🔬 **Advanced Code Analysis**
+### **Advanced Code Analysis**
 - **Cyclomatic Complexity Measurement** - Quantifies code complexity using industry-standard metrics
 - **Function-Level Analysis** - Deep dive into individual function complexity and performance characteristics
 - **Nesting Depth Detection** - Identifies deeply nested code structures that impact maintainability
 - **Loop & Conditional Counting** - Comprehensive control flow analysis
 
-### ⚡ **Performance Intelligence**
+###**Performance Intelligence**
 - **Time Complexity Estimation** - Algorithmic complexity analysis (O(1), O(n), O(n²), O(2ⁿ))
 - **Space Complexity Analysis** - Memory usage pattern detection
 - **Recursion Detection** - Identifies recursive functions and potential stack overflow risks
 - **Array Usage Tracking** - Memory allocation pattern analysis
 
-### 🎨 **Premium User Experience**
+###**Premium User Experience**
 - **Drag & Drop Upload** - Intuitive file handling with visual feedback
 - **Real-time Processing** - Instant analysis with progress indicators
 - **Interactive Visualizations** - Beautiful charts powered by Chart.js
 - **Responsive Design** - Seamless experience across all devices
 - **Dark Mode Support** - Eye-friendly interface options
 
-### 📄 **Professional Reporting**
+###**Professional Reporting**
 - **PDF Export** - Generate comprehensive analysis reports
 - **Detailed Metrics** - Function-by-function breakdown
 - **Actionable Insights** - Specific recommendations for code improvement
@@ -58,7 +58,7 @@
 
 ---
 
-## 🛠 Tech Stack
+##Tech Stack
 
 ### **Frontend**
 - **Framework**: Next.js 15 with TypeScript
@@ -83,7 +83,7 @@
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 - **Node.js** 18+ and npm/yarn
@@ -91,7 +91,7 @@
 - **C++ Compiler** (GCC 9+ or Clang 10+)
 - **CMake** 3.16+ (optional, for building analyzer)
 
-### 🔧 Quick Setup
+### Quick Setup
 
 ```bash
 # Clone the repository
@@ -115,7 +115,7 @@ cmake ..
 make
 ```
 
-### 🐳 Docker Setup (Recommended)
+### Docker Setup (Recommended)
 
 ```bash
 # Coming soon - Docker Compose setup for one-command deployment
@@ -124,7 +124,7 @@ docker-compose up --build
 
 ---
 
-## 🎯 Usage
+## Usage
 
 ### **Web Interface**
 
@@ -172,15 +172,15 @@ docker-compose up --build
 
 ---
 
-## 📊 Complexity Metrics
+## Complexity Metrics
 
 ### **Scoring System**
 
 | Score Range | Category | Color | Description |
 |-------------|----------|-------|-------------|
-| 1-3 | **Simple** | 🟢 Green | Low complexity, easy to maintain |
-| 4-6 | **Moderate** | 🟡 Amber | Moderate complexity, may need refactoring |
-| 7+ | **Complex** | 🔴 Red | High complexity, requires immediate attention |
+| 1-3 | **Simple** | Green | Low complexity, easy to maintain |
+| 4-6 | **Moderate** | Amber | Moderate complexity, may need refactoring |
+| 7+ | **Complex** | Red | High complexity, requires immediate attention |
 
 ### **Analysis Factors**
 - **Control Flow**: if/else statements, loops, switch cases
@@ -191,7 +191,7 @@ docker-compose up --build
 
 ---
 
-## 🌐 API Reference
+## API Reference
 
 ### **Analyze Code**
 ```http
@@ -233,7 +233,7 @@ Content-Type: application/json
 
 ---
 
-## 🔮 Future Roadmap
+## Future Roadmap
 
 - [ ] **Multi-language Support** - Java, Python, JavaScript analysis
 - [ ] **CI/CD Integration** - GitHub Actions, Jenkins plugins  
@@ -245,7 +245,7 @@ Content-Type: application/json
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
@@ -265,20 +265,20 @@ git push origin feature/amazing-new-feature
 ```
 
 ### **Contribution Guidelines**
-- 📋 **Issues**: Report bugs or request features via GitHub Issues
-- 🔧 **Pull Requests**: Follow our PR template and coding standards
-- 📖 **Documentation**: Help improve our docs and examples
-- 🧪 **Testing**: Add tests for new features and bug fixes
+- **Issues**: Report bugs or request features via GitHub Issues
+- **Pull Requests**: Follow our PR template and coding standards
+- **Documentation**: Help improve our docs and examples
+- **Testing**: Add tests for new features and bug fixes
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🎖 Acknowledgments
+## Acknowledgments
 
 - **Chart.js** team for excellent visualization library
 - **Django REST Framework** for robust API foundation  
@@ -288,18 +288,18 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 📞 Support & Contact
+## Support & Contact
 
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/bitgladiator/code-complexity-analyzer/issues)
-- **💡 Feature Requests**: [Discussions](https://github.com/bitgladiator/code-complexity-analyzer/discussions)  
-- **📧 Email**: karansh1232@gmail.com
-- **🐦 Twitter**: [KaranSharma1020](https://twitter.com/KaranSharma1020)
+- ** Bug Reports**: [GitHub Issues](https://github.com/bitgladiator/code-complexity-analyzer/issues)
+- ** Feature Requests**: [Discussions](https://github.com/bitgladiator/code-complexity-analyzer/discussions)  
+- ** Email**: karansh1232@gmail.com
+- ** Twitter**: [KaranSharma1020](https://twitter.com/KaranSharma1020)
 
 ---
 
 <div align="center">
 
-**⭐ If this project helped you, please give it a star! ⭐**
+** If this project helped you, please give it a star! **
 
 Made with ❤️ by [Karan Sharma](https://github.com/bitgladiator)
 
